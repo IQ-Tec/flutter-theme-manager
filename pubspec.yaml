@@ -1,7 +1,8 @@
 name: theme_manager
-description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+description: "A configurable and reusable theme management package for Flutter applications with support for Riverpod, Provider, and other state management solutions."
+version: 0.1.0
+homepage: https://github.com/your-username/theme_manager
+repository: https://github.com/your-username/theme_manager
 
 environment:
   sdk: ^3.9.0
@@ -10,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_riverpod: ^2.5.1
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
