@@ -2,29 +2,27 @@
 
 Un paquete Flutter configurable y reutilizable para gestión de temas con soporte para Riverpod y persistencia automática.
 
-## Características
+## ✨ Características
 
 - 🎨 Gestión sencilla de temas claro y oscuro
-- 💾 Persistencia automática de preferencias usando SharedPreferences
-- 🔧 Completamente configurable
-- 🌍 Soporte para localización
-- 📱 Widgets predefinidos para selector y display de tema
-- 🏗️ Compatible con Riverpod
+- 💾 Persistencia automática con SharedPreferences
+- 🔧 Completamente configurable (desde plug & play hasta personalización total)
+- 🌍 Soporte para localización (español por defecto)
+- 📱 Widgets predefinidos listos para usar
+- 🏗️ Compatible con Riverpod (convive con Provider clásico)
 - 🎯 API simple y consistente
 
-## Instalación
-
-Añade esto a tu `pubspec.yaml`:
+## 📦 Instalación
 
 ```yaml
 dependencies:
   theme_manager: ^0.1.0
-  flutter_riverpod: ^2.5.1
+  flutter_riverpod: ^2.5.1  # Necesario para ConsumerWidget
 ```
 
-## Uso Básico
+## 🚀 Uso Básico (Plug & Play)
 
-### 1. Configuración inicial
+### 1. Configuración mínima
 
 ```dart
 import 'package:flutter/material.dart';
@@ -32,279 +30,206 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:theme_manager/theme_manager.dart';
 
 void main() {
-  runApp(
-    ProviderScope(
-      overrides: [
-        // Configura el tema
-        themeConfigProvider.overrideWithValue(
-          ThemeConfig(
-            light: ThemeData.light(),
-            dark: ThemeData.dark(),
-            defaultThemeMode: ThemeMode.system,
-          ),
-        ),
-      ],
-      child: MyApp(),
-    ),
-  );
+  runApp(ProviderScope(child: MyApp()));
 }
 
+// Solo MaterialApp necesita ser ConsumerWidget
 class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
-    final lightTheme = ref.watch(currentLightThemeProvider);
-    final darkTheme = ref.watch(currentDarkThemeProvider);
-
+    
     return MaterialApp(
-      title: 'Mi App',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: themeMode,
-      home: MyHomePage(),
+      theme: ThemeData.light(),     // Tu tema claro
+      darkTheme: ThemeData.dark(),  // Tu tema oscuro
+      themeMode: themeMode,         // Manejado por theme_manager
+      home: HomeScreen(),
     );
   }
 }
 ```
 
-### 2. Usando los widgets
-
-#### Selector de tema como botón de icono
+### 2. Agregar widgets
 
 ```dart
+// En AppBar como icono
 AppBar(
   title: Text('Mi App'),
   actions: [
     ThemeSelector.iconButton(),
   ],
 )
-```
 
-#### Selector de tema como ListTile
-
-```dart
+// En configuraciones como ListTile
 Column(
   children: [
     ThemeSelector.listTile(),
-    // otros widgets...
+    // Otras configuraciones...
+  ],
+)
+
+// Para mostrar el tema actual
+Row(
+  children: [
+    Text('Tema: '),
+    ThemeDisplay(),
   ],
 )
 ```
 
-#### Display del tema actual
+## 🎨 Configuración Intermedia
+
+### Personalizar temas
 
 ```dart
-// Display simple
-ThemeDisplay()
-
-// Como chip
-ThemeChip(
-  onTap: () {
-    // Acción personalizada
-  },
-)
-
-// Como badge
-ThemeBadge()
-```
-
-### 3. Controlando el tema programáticamente
-
-```dart
-class MyWidget extends ConsumerWidget {
+class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeNotifier = ref.read(themeProvider.notifier);
+    final themeMode = ref.watch(themeProvider);
     
-    return Column(
-      children: [
-        ElevatedButton(
-          onPressed: () => themeNotifier.setTheme(ThemeMode.dark),
-          child: Text('Tema Oscuro'),
-        ),
-        ElevatedButton(
-          onPressed: () => themeNotifier.setTheme(ThemeMode.light),
-          child: Text('Tema Claro'),
-        ),
-        ElevatedButton(
-          onPressed: () => themeNotifier.toggleTheme(),
-          child: Text('Alternar Tema'),
-        ),
-      ],
+    return MaterialApp(
+      theme: _buildLightTheme(),    // Tu tema personalizado
+      darkTheme: _buildDarkTheme(), // Tu tema personalizado
+      themeMode: themeMode,
+      home: HomeScreen(),
+    );
+  }
+  
+  ThemeData _buildLightTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      primarySwatch: Colors.blue,
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      // Tu personalización...
+    );
+  }
+  
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      primarySwatch: Colors.blue,
+      // Tu personalización...
     );
   }
 }
 ```
 
-## Configuración Avanzada
-
-### Configuración personalizada
+### Widgets personalizados
 
 ```dart
-final customConfig = ThemeConfig(
-  light: myCustomLightTheme,
-  dark: myCustomDarkTheme,
-  storageKey: 'mi_app_theme',
-  defaultThemeMode: ThemeMode.light,
-  localization: ThemeLocalization(
-    dialogTitle: 'Elegir Tema',
-    lightThemeName: 'Claro',
-    darkThemeName: 'Oscuro',
-    systemThemeName: 'Auto',
-    // ... más personalizaciones
-  ),
-);
+// Selector con icono personalizado
+ThemeSelector.iconButton(
+  customIcon: Icons.palette,
+)
 
-// En main()
+// Con callback personalizado
+ThemeSelector.listTile(
+  onThemeChanged: (ThemeMode mode) {
+    print('Tema cambiado a: $mode');
+    // Tu lógica personalizada
+  },
+```
+
+## 🎯 Dos Formas de Usar el Paquete
+
+### Forma 1: Solo Gestión de Estado (Recomendado para empezar)
+```dart
+// El paquete SOLO maneja el ThemeMode (light/dark/system)
+// TÚ defines los temas en tu app
+class MyApp extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    
+    return MaterialApp(
+      theme: AppTheme.lightTheme,    // TU tema personalizado
+      darkTheme: AppTheme.darkTheme, // TU tema personalizado
+      themeMode: themeMode,          // Solo el modo del paquete
+      home: HomeScreen(),
+    );
+  }
+}
+```
+
+### Forma 2: Gestión Completa (Avanzado)
+```dart
+// El paquete gestiona TANTO el modo COMO los temas
+// TÚ le das tus temas al paquete, él los devuelve cuando los necesites
+
+// 1. Configurar el paquete con TUS temas
 ProviderScope(
   overrides: [
-    themeConfigProvider.overrideWithValue(customConfig),
+    themeConfigProvider.overrideWithValue(
+      ThemeConfig(
+        light: AppTheme.lightTheme,  // TU tema → al paquete
+        dark: AppTheme.darkTheme,    // TU tema → al paquete
+      ),
+    ),
   ],
   child: MyApp(),
 )
+
+// 2. El paquete devuelve TUS temas cuando los pidas
+class MyApp extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeProvider);
+    final lightTheme = ref.watch(currentLightThemeProvider);  // TU tema desde el paquete
+    final darkTheme = ref.watch(currentDarkThemeProvider);    // TU tema desde el paquete
+    
+    return MaterialApp(
+      theme: lightTheme,      // El paquete devuelve TU tema
+      darkTheme: darkTheme,   // El paquete devuelve TU tema
+      themeMode: themeMode,
+      home: HomeScreen(),
+    );
+  }
+}
 ```
 
-### Temas personalizados
+### 🔍 Sistema de Fallbacks
+
+El paquete funciona como un **contenedor inteligente**:
 
 ```dart
-// Define tus temas personalizados
-final lightTheme = ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.blue,
-    brightness: Brightness.light,
-  ),
-  // tu configuración personalizada...
-);
+// Si NO le das temas personalizados:
+currentLightThemeProvider → ThemeData.light()   // Fallback de Flutter
+currentDarkThemeProvider → ThemeData.dark()     // Fallback de Flutter
 
-final darkTheme = ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.blue,
-    brightness: Brightness.dark,
-  ),
-  // tu configuración personalizada...
-);
-
-final config = ThemeConfig(
-  light: lightTheme,
-  dark: darkTheme,
-);
+// Si SÍ le das tus temas:
+currentLightThemeProvider → AppTheme.lightTheme  // TU tema
+currentDarkThemeProvider → AppTheme.darkTheme    // TU tema
 ```
 
-### Localización personalizada
+**El paquete NUNCA define estilos propios, solo gestiona lo que TÚ le das.**
+
+## ⚙️ Configuración Avanzada
+
+### 1. Override completo de configuración
 
 ```dart
-final spanishLocalization = ThemeLocalization(
-  dialogTitle: 'Seleccionar Tema',
-  cancelButton: 'Cancelar',
-  selectorTooltip: 'Cambiar Tema',
-  lightThemeName: 'Claro',
-  darkThemeName: 'Oscuro',
-  systemThemeName: 'Sistema',
-  lightThemeDescription: 'Usar tema claro',
-  darkThemeDescription: 'Usar tema oscuro',
-  systemThemeDescription: 'Seguir sistema',
-  themeTitle: 'Apariencia',
-);
-
-final config = ThemeConfig(
-  localization: spanishLocalization,
-);
-```
-
-## API Reference
-
-### ThemeConfig
-
-Clase de configuración principal:
-
-```dart
-ThemeConfig({
-  ThemeData? light,              // Tema claro
-  ThemeData? dark,               // Tema oscuro
-  String storageKey,             // Clave para persistencia
-  ThemeMode defaultThemeMode,    // Tema por defecto
-  ThemeLocalization localization, // Textos localizados
-})
-```
-
-### ThemeSelector
-
-Widget para selección de tema:
-
-```dart
-// Constructor principal
-ThemeSelector({
-  bool asIconButton = false,
-  IconData? customIcon,
-  ThemeConfig? customConfig,
-  void Function(ThemeMode)? onThemeChanged,
-})
-
-// Factory constructors
-ThemeSelector.iconButton()
-ThemeSelector.listTile()
-```
-
-### ThemeDisplay
-
-Widget para mostrar tema actual:
-
-```dart
-ThemeDisplay({
-  ThemeConfig? customConfig,
-  TextStyle? textStyle,
-  bool showIcon = true,
-  double spacing = 8.0,
-  IconData? customIcon,
-})
-```
-
-### Providers disponibles
-
-```dart
-themeProvider                 // StateNotifierProvider<ThemeNotifier, ThemeMode>
-themeConfigProvider          // Provider<ThemeConfig>
-isDarkThemeProvider          // Provider<bool>
-isLightThemeProvider         // Provider<bool>
-isSystemThemeProvider        // Provider<bool>
-themeDisplayNameProvider     // Provider<String>
-currentLightThemeProvider    // Provider<ThemeData>
-currentDarkThemeProvider     // Provider<ThemeData>
-```
-
-### ThemeNotifier
-
-Métodos disponibles:
-
-```dart
-Future<void> setTheme(ThemeMode themeMode)
-Future<void> toggleTheme()
-Future<void> resetTheme()
-String get themeDisplayName
-bool get isDark
-bool get isLight
-bool get isSystem
-```
-
-## Ejemplo Completo
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:theme_manager/theme_manager.dart';
-
 void main() {
   runApp(
     ProviderScope(
       overrides: [
         themeConfigProvider.overrideWithValue(
           ThemeConfig(
-            light: ThemeData.light(useMaterial3: true),
-            dark: ThemeData.dark(useMaterial3: true),
-            storageKey: 'my_app_theme',
-            defaultThemeMode: ThemeMode.system,
+            light: MyCustomThemes.light,
+            dark: MyCustomThemes.dark,
+            defaultThemeMode: ThemeMode.dark,
+            storageKey: 'mi_app_theme_personalizada',
+            localization: ThemeLocalization(
+              dialogTitle: 'Elegir Tema',
+              lightThemeName: 'Claro',
+              darkThemeName: 'Oscuro',
+              systemThemeName: 'Auto',
+              // Personaliza todos los textos...
+            ),
           ),
         ),
       ],
@@ -312,62 +237,154 @@ void main() {
     ),
   );
 }
+```
 
-class MyApp extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeProvider);
-    final lightTheme = ref.watch(currentLightThemeProvider);
-    final darkTheme = ref.watch(currentDarkThemeProvider);
+### 2. Localización personalizada
 
-    return MaterialApp(
-      title: 'Theme Manager Demo',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: themeMode,
-      home: HomePage(),
-    );
-  }
-}
+```dart
+// Para inglés
+ThemeConfig(
+  localization: ThemeLocalization(
+    dialogTitle: 'Select Theme',
+    lightThemeName: 'Light',
+    darkThemeName: 'Dark',
+    systemThemeName: 'System',
+    lightThemeDescription: 'Always use light theme',
+    darkThemeDescription: 'Always use dark theme',
+    systemThemeDescription: 'Follow system settings',
+    themeTitle: 'Theme',
+    selectorTooltip: 'Select Theme',
+    cancelButton: 'Cancel',
+  ),
+)
 
-class HomePage extends StatelessWidget {
+// Para francés
+ThemeConfig(
+  localization: ThemeLocalization(
+    dialogTitle: 'Sélectionner le Thème',
+    lightThemeName: 'Clair',
+    darkThemeName: 'Sombre',
+    systemThemeName: 'Système',
+    // etc...
+  ),
+)
+```
+
+### 3. Configuración por widget
+
+```dart
+// Override de configuración solo para este widget
+ThemeSelector.listTile(
+  customConfig: ThemeConfig(
+    localization: ThemeLocalization(
+      dialogTitle: 'Mi Título Personalizado',
+      // Solo este widget usará estos textos
+    ),
+  ),
+)
+```
+
+## 🔧 API Completa
+
+### Widgets Disponibles
+
+```dart
+// Constructores principales
+ThemeSelector.iconButton({
+  IconData? customIcon,
+  ThemeConfig? customConfig,
+  Function(ThemeMode)? onThemeChanged,
+})
+
+ThemeSelector.listTile({
+  ThemeConfig? customConfig,
+  Function(ThemeMode)? onThemeChanged,
+})
+
+// Widget de display
+ThemeDisplay()
+```
+
+### Providers Disponibles
+
+```dart
+// Principal
+final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>
+
+// Helpers
+final isDarkThemeProvider = Provider<bool>
+final isLightThemeProvider = Provider<bool>
+final isSystemThemeProvider = Provider<bool>
+final themeDisplayNameProvider = Provider<String>
+final currentLightThemeProvider = Provider<ThemeData>
+final currentDarkThemeProvider = Provider<ThemeData>
+```
+
+### Métodos del Notifier
+
+```dart
+// Cambiar tema
+ref.read(themeProvider.notifier).setTheme(ThemeMode.dark);
+
+// Obtener información
+final notifier = ref.read(themeProvider.notifier);
+String displayName = notifier.themeDisplayName;
+bool isDark = notifier.isDarkMode;
+bool isSystem = notifier.isSystemMode;
+```
+
+## 🤝 Convivencia con Provider
+
+El paquete convive perfectamente con apps que usan Provider clásico:
+
+```dart
+// Tu app existente
+MultiProvider(
+  providers: [
+    ChangeNotifierProvider(create: (_) => UserProvider()),
+    ChangeNotifierProvider(create: (_) => CartProvider()),
+    // ... otros providers
+  ],
+  child: ProviderScope( // Solo para theme_manager
+    child: MyApp(),
+  ),
+)
+
+// En cualquier pantalla
+class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Theme Manager Demo'),
-        actions: [
-          ThemeSelector.iconButton(),
-        ],
-      ),
-      body: Column(
-        children: [
-          ListTile(
-            title: Text('Configuraciones'),
-          ),
-          ThemeSelector.listTile(),
-          SizedBox(height: 20),
-          Center(
-            child: Column(
-              children: [
-                Text('Tema actual:'),
-                ThemeDisplay(),
-                SizedBox(height: 10),
-                ThemeChip(),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        // Tu UI existente con Provider
+        Consumer<UserProvider>(
+          builder: (context, user, _) => UserProfile(user: user),
+        ),
+        
+        // Selector de tema (usa Riverpod internamente)
+        ThemeSelector.listTile(),
+      ],
     );
   }
 }
 ```
 
-## Mejores Prácticas
+## 📚 Ejemplos Completos
 
-Para patrones de uso avanzados, personalización de widgets y mejores prácticas, consulta [BEST_PRACTICES.md](BEST_PRACTICES.md).
+Consulta la carpeta `example/` para ver:
+- ✅ Configuración básica
+- ✅ Personalización de temas
+- ✅ Localización múltiple
+- ✅ Convivencia con Provider
 
-## Licencia
+## 🛠️ Mejores Prácticas
+
+Para patrones de uso avanzados y mejores prácticas, consulta [BEST_PRACTICES.md](BEST_PRACTICES.md).
+
+## 📋 Changelog
+
+Consulta [CHANGELOG.md](CHANGELOG.md) para ver las novedades y cambios en cada versión.
+
+## 📄 Licencia
 
 MIT

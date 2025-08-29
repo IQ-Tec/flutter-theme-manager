@@ -4,11 +4,9 @@ import '../models/theme_config.dart';
 import '../notifiers/theme_notifier.dart';
 
 /// Global theme configuration provider
+/// Override this in your ProviderScope if you need custom configuration
 final themeConfigProvider = Provider<ThemeConfig>((ref) {
-  throw UnimplementedError(
-    'themeConfigProvider must be overridden in your app. '
-    'Use ProviderScope with overrides to provide a ThemeConfig.',
-  );
+  return const ThemeConfig(); // Defaults razonables
 });
 
 /// Theme state provider
