@@ -16,7 +16,10 @@ Un paquete Flutter configurable y reutilizable para gestión de temas con soport
 
 ```yaml
 dependencies:
-  theme_manager: ^0.1.0
+  theme_manager:
+    git:
+      url: https://github.com/IQ-Tec/flutter-theme-manager.git
+      ref: v0.1.0
   flutter_riverpod: ^2.5.1  # Necesario para ConsumerWidget
 ```
 
