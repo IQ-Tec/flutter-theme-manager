@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/theme_config.dart';
 import '../notifiers/theme_notifier.dart';
+import 'theme_config_provider.dart';
 
-/// Global theme configuration provider
-/// Override this in your ProviderScope if you need custom configuration
-final themeConfigProvider = Provider<ThemeConfig>((ref) {
-  return const ThemeConfig(); // Defaults razonables
-});
-
-/// Theme state provider
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
-  final config = ref.watch(themeConfigProvider);
-  return ThemeNotifier(config: config);
+/// Theme state provider using new Riverpod 3.x API
+final themeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(() {
+  return ThemeNotifier();
 });
 
 /// Helper providers for common theme checks

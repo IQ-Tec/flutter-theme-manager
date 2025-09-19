@@ -2,19 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/theme_config.dart';
 import '../services/theme_service.dart';
+import '../providers/theme_config_provider.dart';
 
-/// Theme notifier for managing theme state with Riverpod
-class ThemeNotifier extends StateNotifier<ThemeMode> {
-  final ThemeService _themeService;
-  final ThemeConfig _config;
+/// Theme notifier for managing theme state with Riverpod 3.x
+class ThemeNotifier extends Notifier<ThemeMode> {
+  late final ThemeService _themeService;
+  late final ThemeConfig _config;
 
-  ThemeNotifier({
-    required ThemeConfig config,
-    ThemeService? themeService,
-  }) : _config = config,
-       _themeService = themeService ?? ThemeService(storageKey: config.storageKey),
-       super(config.defaultThemeMode) {
+  @override
+  ThemeMode build() {
+    // Access config directly from provider
+    _config = ref.watch(themeConfigProvider);
+    _themeService = ThemeService(storageKey: _config.storageKey);
+    
+    // Load theme asynchronously
     _loadTheme();
+    
+    // Return initial state
+    return _config.defaultThemeMode;
   }
 
   /// Load theme from storage
@@ -60,9 +65,7 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
   /// Check if current theme is light
   bool get isLight => state == ThemeMode.light;
 
-  /// Check if current theme follows system
+  /// Check if current theme is system
   bool get isSystem => state == ThemeMode.system;
-
-  /// Get theme configuration
-  ThemeConfig get config => _config;
 }
+

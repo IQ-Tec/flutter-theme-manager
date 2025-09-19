@@ -1,3 +1,24 @@
+## 0.2.0 - 2025-08-28
+
+### Changed
+- **BREAKING CHANGE**: Migrado a Riverpod 3.x
+- **BREAKING CHANGE**: `StateNotifierProvider` reemplazado por `NotifierProvider`
+- **BREAKING CHANGE**: `StateNotifier` reemplazado por `Notifier`
+- Actualizado `flutter_riverpod` de ^2.5.1 a ^3.0.0
+
+### Added
+- Nuevo archivo `theme_config_provider.dart` para evitar dependencias circulares
+- Mejor separación de responsabilidades en providers
+
+### Improved
+- API más moderna usando las últimas características de Riverpod
+- Mejor rendimiento con la nueva arquitectura de Riverpod 3.x
+
+### Migration Guide
+Para migrar de v0.1.x a v0.2.0:
+1. Actualizar `flutter_riverpod` a ^3.0.0 en tu `pubspec.yaml`
+2. No hay cambios necesarios en el código de usuario (solo en el pubspec.yaml)
+
 ## 0.1.0
 
 ### Added

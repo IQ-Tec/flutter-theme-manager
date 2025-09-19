@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/theme_provider.dart';
+import '../providers/theme_config_provider.dart';
 import '../models/theme_config.dart';
 import '../enums/theme_mode_extension.dart';
 

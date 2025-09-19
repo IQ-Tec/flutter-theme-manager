@@ -20,7 +20,7 @@ dependencies:
     git:
       url: https://github.com/IQ-Tec/flutter-theme-manager.git
       ref: v0.1.0
-  flutter_riverpod: ^2.5.1  # Necesario para ConsumerWidget
+  flutter_riverpod: ^3.0.0  # Riverpod 3.x con nueva API
 ```
 
 ## 🚀 Uso Básico (Plug & Play)
